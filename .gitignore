@@ -4,3 +4,7 @@ k400
 k400_targz
 k600
 k600_targz
+
+test.tar
+train.tar
+val.tar
