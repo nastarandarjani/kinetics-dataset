@@ -13,8 +13,10 @@ def check_video(video_path):
         return True
     except Exception as e:
         print(f"Corrupted file detected: {video_path} - {e}")
-        return False
-
+        if "temporarily unavailable" not in str(e):
+            return False
+        else:
+            return True
 
 def remove_corrupt_videos(video_dir):
     """Remove corrupted video files from the specified directory."""

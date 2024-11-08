@@ -1,27 +1,20 @@
-#!/bin/bash
-
-SRC_DIR="$SLURM_TMPDIR/data/train/raw"
-TARGET_DIR="$SLURM_TMPDIR/data/train/downsampled"
+SRC_DIR="/home/nasi14/scratch/k400/downsampled/train"
+TARGET_DIR="/home/nasi14/scratch/k400/downsampled/train/train"
 
 mkdir -p "$TARGET_DIR"
 
-
-# Process each video in the background
-for video in "$SRC_DIR"/*; do
+# Function to process each video
+process_video() {
+    video="$1"
     filename=$(basename "$video")
-    output="$TARGET_DIR/$filename"
+    output="/home/nasi14/scratch/k400/downsampled/train/train/$filename"
 
-    # Run ffmpeg in the background
-    ffmpeg -i "$video" -vf "scale=-2:256" -c:a copy "$output" &
-    
-    # Limit number of background jobs to 40
-    if (( $(jobs -r | wc -l) >= 39 )); then
-        wait -n
-    fi
-done
+    echo "----"
+    # Run ffmpeg to resize and save the output
+    ffmpeg -y -i "$video" -vf "scale=-2:256" -c:a copy "$output" > /dev/null 2>&1 && rm -v "$video"
+}
 
-# Wait for all background jobs to complete
-wait
+export -f process_video  # Export the function for use in subshells
 
-
-echo "Resizing complete. Check the target folder: $TARGET_DIR"
+# Find and process videos in parallel with xargs, limited to 8 processes
+find "$SRC_DIR" -maxdepth 1 -type f -print0 | xargs -0 -n 1 -P 35 bash -c 'process_video "$@"' _
