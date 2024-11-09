@@ -1,5 +1,4 @@
 SRC_DIR="/home/nasi14/scratch/k400/downsampled/train"
-TARGET_DIR="/home/nasi14/scratch/k400/downsampled/train/train"
 
 mkdir -p "$TARGET_DIR"
 
